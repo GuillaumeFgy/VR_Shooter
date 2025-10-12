@@ -32,6 +32,9 @@ public class PlayerShooting : MonoBehaviour
     [Header("Reload")]
     public float reloadTime = 1.6f;
 
+    [Header("Input")]
+    public SoundDetector clap;
+
     // --- private ---
     private int bullets;
     private bool reloading;
@@ -61,13 +64,7 @@ public class PlayerShooting : MonoBehaviour
     void Update()
     {
         elapsed += Time.deltaTime;
-
-        // Gather inputs that work on mobile + Cardboard
-        bool triggerPressed =
-            Input.GetMouseButton(0) ||                       // editor / some SDK mappings
-            Input.touchCount > 0 ||                          // mobile tap
-            Input.GetKey(KeyCode.Space) ||                   // keyboard fallback (editor)
-            Input.GetKey(KeyCode.JoystickButton0);           // common VR trigger mapping
+        bool triggerPressed = clap && clap.ConsumeClap();
 
         if (triggerPressed && !reloading && elapsed >= timeBetweenBullets && bullets > 0 && Time.timeScale > 0f)
         {

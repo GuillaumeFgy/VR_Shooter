@@ -122,6 +122,57 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &95584230
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 95584232}
+  - component: {fileID: 95584231}
+  m_Layer: 0
+  m_Name: SoundDetector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &95584231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95584230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6254ec8bc899d344b81f1c925b9242d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  windowMs: 20
+  thresholdDb: -45
+  minInterval: 0.45
+  minPeakToRms: 3
+  micDevice: 
+  sampleRate: 44100
+  logClaps: 0
+--- !u!4 &95584232
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95584230}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.48554918, y: 2.414724, z: 0.6322268}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &148680882
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,7 +365,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 1
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -613,6 +664,7 @@ MonoBehaviour:
   initialBullets: 3
   bulletImages: []
   reloadTime: 1.6
+  clap: {fileID: 95584231}
 --- !u!1 &955127915
 GameObject:
   m_ObjectHideFlags: 0
@@ -1187,7 +1239,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 1
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -1229,7 +1281,7 @@ Light:
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
-  m_ShadowRadius: 0
+  m_ShadowRadius: 10
   m_ShadowAngle: 0
 --- !u!1 &1490385947
 GameObject:
@@ -1633,4 +1685,5 @@ SceneRoots:
   - {fileID: 389255506}
   - {fileID: 1199920617}
   - {fileID: 907292808}
+  - {fileID: 95584232}
   - {fileID: 1518033083}
