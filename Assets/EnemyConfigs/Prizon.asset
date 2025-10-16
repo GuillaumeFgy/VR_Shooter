@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ddf80025dc402b4a99aa18a715befc8, type: 3}
+  m_Name: Prizon
+  m_EditorClassIdentifier: 
+  maxHP: 50
+  moveSpeed: 1.8
+  turnSpeed: 360
+  contactDamage: 10
+  projectileDamage: 5
+  attackRate: 1.2
+  attackRange: 6
+  projectileSpeed: 12
+  strafeRadius: 3.5
+  zigZagAmplitude: 1.2
+  zigZagFrequency: 2.2
+  deathVfx: {fileID: 0}
+  deathSfx: {fileID: 0}

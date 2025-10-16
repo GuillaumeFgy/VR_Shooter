@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ddf80025dc402b4a99aa18a715befc8, type: 3}
+  m_Name: Spider
+  m_EditorClassIdentifier: 
+  maxHP: 1
+  moveSpeed: 1.8
+  turnSpeed: 360
+  contactDamage: 10
+  projectileDamage: 0
+  attackRate: 1.2
+  attackRange: 1
+  projectileSpeed: 0
+  strafeRadius: 0
+  zigZagAmplitude: 0
+  zigZagFrequency: 0
+  deathVfx: {fileID: 0}
+  deathSfx: {fileID: 0}
