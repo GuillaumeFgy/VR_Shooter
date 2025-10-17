@@ -27,6 +27,13 @@ public class SoundDetector : MonoBehaviour
     float[] sampleBuf;
     bool didClapThisFrame;
 
+    float inhibitUntil = 0f;
+
+    public void Inhibit(float seconds)
+    {
+        inhibitUntil = Mathf.Max(inhibitUntil, Time.time + Mathf.Max(0f, seconds));
+    }
+
     public bool DidClapThisFrame()
     {
         return didClapThisFrame;
@@ -77,11 +84,9 @@ public class SoundDetector : MonoBehaviour
     void Update()
     {
         didClapThisFrame = false;
-        if (micClip == null) return;
+        if (micClip == null || sampleBuf == null || sampleBuf.Length == 0) return;
 
-        int sr = micClip.frequency;
         int windowSamples = sampleBuf.Length;
-
         int micPos = Microphone.GetPosition(micDevice);
         if (micPos < windowSamples) return; // not enough data yet
 
@@ -104,19 +109,23 @@ public class SoundDetector : MonoBehaviour
         // dBFS: 0 dB = full scale (amplitude 1.0)
         float db = 20f * Mathf.Log10(Mathf.Max(1e-7f, rms));
 
-        // Heuristic: must be loud enough AND spiky (peak>>rms) AND outside debounce
+        // Heuristic: must be loud enough AND spiky (peak>>rms)
         float peakToRms = (rms > 1e-6f) ? (peak / rms) : 999f;
         bool loud = db >= thresholdDb;
         bool spiky = peakToRms >= minPeakToRms;
-        bool cooledDown = (Time.time - lastClapTime) >= minInterval;
 
-        if (loud && spiky && cooledDown)
+        // Debounce + external inhibit gate
+        bool cooledDown = (Time.time - lastClapTime) >= minInterval;
+        bool notInhibited = Time.time >= inhibitUntil;
+
+        if (loud && spiky && cooledDown && notInhibited)
         {
             lastClapTime = Time.time;
             didClapThisFrame = true;
             if (logClaps) Debug.Log($"Clap! db={db:F1} peak/rms={peakToRms:F2}");
         }
     }
+
 
     void OnDisable()
     {

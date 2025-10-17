@@ -5,7 +5,7 @@ using System.Collections;
 public class PlayerShooting : MonoBehaviour
 {
     [Header("Damage & Timing")]
-    public int damagePerShot = 20;
+    public int damagePerShot = 1;
     public float timeBetweenBullets = 0.15f;
 
     [Header("Barrel / Aiming")]
@@ -27,7 +27,6 @@ public class PlayerShooting : MonoBehaviour
 
     [Header("Ammo UI")]
     public int initialBullets = 3;
-    public Image[] bulletImages;
 
     [Header("Reload")]
     public float reloadTime = 1.6f;
@@ -57,8 +56,6 @@ public class PlayerShooting : MonoBehaviour
             lineRenderer.positionCount = 2;
             lineRenderer.enabled = false;
         }
-
-        UpdateBulletUI();
     }
 
     void Update()
@@ -78,7 +75,6 @@ public class PlayerShooting : MonoBehaviour
 
         // Consume ammo immediately to prevent over-firing
         bullets--;
-        UpdateBulletUI();
 
         // Play sound/anim
         if (shootClip) audioSrc.PlayOneShot(shootClip);
@@ -100,15 +96,23 @@ public class PlayerShooting : MonoBehaviour
             }
 
             // Damage enemy (prefer CompareTag for perf/safety)
-            if (hit.collider != null && hit.collider.CompareTag("enemy"))
+            if (hit.collider != null && hit.collider.CompareTag("Enemy"))
             {
-                var eh = hit.collider.GetComponent<EnemyHealth>();
-                if (eh != null)
+                var eh = hit.collider.GetComponentInParent<EnemyHealth>();
+                if (eh != null) 
+                {
                     eh.TakeDamage(damagePerShot);
+                }
+                else
+                {
+                    Debug.LogError("NO ENEMY HEALTH");
+                }
+                   
             }
         }
         else
         {
+            Debug.LogError("NO HIT");
             // Draw tracer straight ahead to max distance
             if (lineRenderer)
             {
@@ -145,19 +149,7 @@ public class PlayerShooting : MonoBehaviour
         yield return new WaitForSeconds(reloadTime);
 
         bullets = initialBullets;
-        UpdateBulletUI();
         reloading = false;
     }
 
-    private void UpdateBulletUI()
-    {
-        if (bulletImages == null) return;
-
-        // Fill from left to right; show 'bullets' images
-        for (int i = 0; i < bulletImages.Length; i++)
-        {
-            bool enabled = i < bullets;
-            if (bulletImages[i]) bulletImages[i].enabled = enabled;
-        }
-    }
 }

@@ -22,7 +22,11 @@ public class EnemyController : MonoBehaviour
 
     [Header("Animation")]
     public Animator anim;
-    public string animIntName = "animation";
+    [SerializeField] string pSpeed = "Speed";
+    [SerializeField] string pInMelee = "InMelee";
+    [SerializeField] string tAttack = "Attack";
+    [SerializeField] string tHit = "Hit";
+    [SerializeField] string bDead = "Dead";
 
     [Header("Gizmos")]
     public bool drawRanges = true;
@@ -82,14 +86,10 @@ public class EnemyController : MonoBehaviour
     {
         Vector3 vel = transform.forward * (config.moveSpeed * speedMul);
         transform.position += vel * Time.deltaTime;
-
-        if (!anim) return;
-
-        if (vel.magnitude > 0.05f)
-            anim.SetInteger(animIntName, 2); // moving
-        else
-            anim.SetInteger(animIntName, 1); // idle
+        if (anim) anim.SetFloat(pSpeed, vel.magnitude);
     }
+
+
 
 
     void TryAttack(bool ranged)
@@ -97,11 +97,11 @@ public class EnemyController : MonoBehaviour
         if (attackTimer < (1f / Mathf.Max(0.01f, config.attackRate))) return;
         attackTimer = 0f;
 
-        if (anim) anim.SetInteger(animIntName, 3); // attack animation
-
-        if (ranged) Shoot();
-        // For melee, use animation event to call OnMeleeHit()
+        if (anim) anim.SetTrigger(tAttack);
+        if (ranged) Shoot(); // melee damage via OnMeleeHit() event
     }
+
+
 
     void Shoot()
     {
@@ -122,12 +122,18 @@ public class EnemyController : MonoBehaviour
 
     void DoCharger()
     {
+        if (!target || !config) return;
         LookAtTargetFlat();
-        MoveForward(1f);
 
         float dist = Vector3.Distance(transform.position, target.position);
-        if (dist <= 1.4f) TryAttack(false);
+        if (dist > config.attackRangeMelee + 0.05f) { MoveForward(1f); return; }
+
+        if (anim) anim.SetFloat(pSpeed, 0f);
+        TryAttack(false);
     }
+
+
+
 
     void DoStrafeShooter()
     {
@@ -153,7 +159,7 @@ public class EnemyController : MonoBehaviour
 
         LookAtTargetFlat();
 
-        if (Vector3.Distance(transform.position, target.position) <= config.attackRange)
+        if (Vector3.Distance(transform.position, target.position) <= config.attackRangeDistance)
             TryAttack(true);
     }
 
@@ -165,13 +171,13 @@ public class EnemyController : MonoBehaviour
         transform.position += (transform.forward * config.moveSpeed + transform.right * side) * Time.deltaTime;
 
         float dist = Vector3.Distance(transform.position, target.position);
-        if (dist <= 1.6f) TryAttack(false);
+        if (dist <= config.attackRangeMelee) TryAttack(false);
     }
 
     void DoTurret()
     {
         LookAtTargetFlat();
-        if (Vector3.Distance(transform.position, target.position) <= config.attackRange)
+        if (Vector3.Distance(transform.position, target.position) <= config.attackRangeDistance)
             TryAttack(true);
     }
 
@@ -182,7 +188,7 @@ public class EnemyController : MonoBehaviour
         float side = Mathf.PerlinNoise(Time.time * 0.8f, zigZagPhase.x) - 0.5f;
         transform.position += (transform.forward * (config.moveSpeed * 0.6f) + transform.right * side * config.moveSpeed) * Time.deltaTime;
 
-        if (Vector3.Distance(transform.position, target.position) <= config.attackRange + 1f)
+        if (Vector3.Distance(transform.position, target.position) <= config.attackRangeDistance + 1f)
             TryAttack(true);
     }
 
@@ -197,32 +203,8 @@ public class EnemyController : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         if (!drawRanges || !config) return;
-        Gizmos.color = Color.red; Gizmos.DrawWireSphere(transform.position, config.attackRange);
+        Gizmos.color = Color.red; Gizmos.DrawWireSphere(transform.position, config.attackRangeMelee);
+        Gizmos.color = Color.magenta; Gizmos.DrawWireSphere(transform.position, config.attackRangeDistance);
         Gizmos.color = Color.cyan; Gizmos.DrawWireSphere(transform.position, config.strafeRadius);
-    }
-
-    /// <summary>
-    /// This method is called by the Main Camera when it starts gazing at this GameObject.
-    /// </summary>
-    public void OnPointerEnter()
-    {
-        return;
-    }
-
-    /// <summary>
-    /// This method is called by the Main Camera when it stops gazing at this GameObject.
-    /// </summary>
-    public void OnPointerExit()
-    {
-        return;
-    }
-
-    /// <summary>
-    /// This method is called by the Main Camera when it is gazing at this GameObject and the screen
-    /// is touched.
-    /// </summary>
-    public void OnPointerClick()
-    {
-        health.TakeDamage(1);
     }
 }
