@@ -73,65 +73,90 @@ public class PlayerShooting : MonoBehaviour
     {
         elapsed = 0f;
 
-        // Consume ammo immediately to prevent over-firing
-        bullets--;
+        ConsumeAmmo();
+        PlayShotAV();
 
-        // Play sound/anim
-        if (shootClip) audioSrc.PlayOneShot(shootClip);
-        if (anim) anim.SetTrigger("Shoot");
+        (Vector3 origin, Vector3 direction) = GetFireRay();
 
-        // Decide ray origin & direction
-        Transform originT = refNozzle ? refNozzle.transform : (cam ? cam.transform : transform);
-        Vector3 origin = originT.position;
-        Vector3 direction = originT.forward;
-
-        // Raycast
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, maxDistance, hitMask, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(origin, direction, out RaycastHit hit, maxDistance, hitMask, QueryTriggerInteraction.Collide))
         {
-            // Draw tracer
-            if (lineRenderer)
-            {
-                lineRenderer.SetPosition(0, origin);
-                lineRenderer.SetPosition(1, hit.point);
-            }
-
-            // Damage enemy (prefer CompareTag for perf/safety)
-            if (hit.collider != null && hit.collider.CompareTag("Enemy"))
-            {
-                var eh = hit.collider.GetComponentInParent<EnemyHealth>();
-                if (eh != null) 
-                {
-                    eh.TakeDamage(damagePerShot);
-                }
-                else
-                {
-                    Debug.LogError("NO ENEMY HEALTH");
-                }
-                   
-            }
+            HandleHit(hit, origin);
         }
         else
         {
-            Debug.LogError("NO HIT");
-            // Draw tracer straight ahead to max distance
-            if (lineRenderer)
-            {
-                lineRenderer.SetPosition(0, origin);
-                lineRenderer.SetPosition(1, origin + direction * maxDistance);
-            }
+            HandleMiss(origin, direction);
         }
 
-        // Fire FX
+        PlayEffects();
+        MaybeStartReload();
+    }
+
+    private void ConsumeAmmo()
+    {
+        // Consume ammo immediately to prevent over-firing
+        bullets--;
+    }
+
+    private void PlayShotAV()
+    {
+        if (shootClip) audioSrc.PlayOneShot(shootClip);
+        if (anim) anim.SetTrigger("Shoot");
+    }
+
+    /// <summary>Returns the firing ray's origin and forward direction.</summary>
+    private (Vector3 origin, Vector3 direction) GetFireRay()
+    {
+        Transform originT = refNozzle ? refNozzle.transform : (cam ? cam.transform : transform);
+        return (originT.position, originT.forward);
+    }
+
+    private void HandleHit(RaycastHit hit, Vector3 origin)
+    {
+        DrawTracer(origin, hit.point);
+
+        // 1) Pop enemy projectiles with one shot
+        var incoming = hit.collider ? hit.collider.GetComponentInParent<EnemyProjectile>() : null;
+        if (incoming)
+        {
+            Destroy(incoming.gameObject);
+            return; // done for this shot
+        }
+
+        // 2) Damage enemies
+        if (hit.collider && hit.collider.CompareTag("Enemy"))
+        {
+            var eh = hit.collider.GetComponentInParent<EnemyHealth>();
+            if (eh != null) eh.TakeDamage(damagePerShot);
+            else Debug.LogError("NO ENEMY HEALTH");
+        }
+    }
+
+    private void HandleMiss(Vector3 origin, Vector3 direction)
+    {
+        Debug.LogError("NO HIT");
+        DrawTracer(origin, origin + direction * maxDistance);
+    }
+
+    private void DrawTracer(Vector3 from, Vector3 to)
+    {
+        if (!lineRenderer) return;
+        lineRenderer.SetPosition(0, from);
+        lineRenderer.SetPosition(1, to);
+    }
+
+    private void PlayEffects()
+    {
         if (gunLight) gunLight.enabled = true;
         if (lineRenderer) lineRenderer.enabled = true;
         StartCoroutine(DisableEffectsAfter(effectsDisplayTime));
-
-        // Reload if we just spent the last round
-        if (bullets <= 0)
-        {
-            StartCoroutine(Reload());
-        }
     }
+
+    private void MaybeStartReload()
+    {
+        if (bullets <= 0)
+            StartCoroutine(Reload());
+    }
+
 
     private IEnumerator DisableEffectsAfter(float delay)
     {

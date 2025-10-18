@@ -105,10 +105,21 @@ public class EnemyController : MonoBehaviour
 
     void Shoot()
     {
-        if (!projectilePrefab) return;
+        if (!projectilePrefab || !target) return;
+
         Transform spawnT = projectileSpawn ? projectileSpawn : transform;
-        LookAtTargetFlat();
-        var go = Instantiate(projectilePrefab, spawnT.position, spawnT.rotation);
+
+        Vector3 aimPos = target.position;
+        // If the target (e.g., the VR camera rig) has a collider, use its center
+        var col = target.GetComponentInParent<Collider>();
+        if (col) aimPos = col.bounds.center;
+
+        Vector3 dir = (aimPos - spawnT.position);
+        if (dir.sqrMagnitude < 0.0001f) dir = spawnT.forward; // fallback
+
+        Quaternion rot = Quaternion.LookRotation(dir.normalized, Vector3.up);
+
+        var go = Instantiate(projectilePrefab, spawnT.position, rot);
         var proj = go.GetComponent<EnemyProjectile>();
         if (proj)
         {
@@ -117,6 +128,7 @@ public class EnemyController : MonoBehaviour
             proj.owner = this;
         }
     }
+
 
     // --- Behaviors ---
 

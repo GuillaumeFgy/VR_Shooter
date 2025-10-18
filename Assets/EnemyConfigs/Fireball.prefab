@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 3648930786529013185}
   - component: {fileID: -6320008178018869706}
   - component: {fileID: 779438022348825944}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Fireball
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
-  speed: 12
+  speed: 2
   lifetime: 5
   owner: {fileID: 6812314282851188598, guid: 5bc8d279dd8931045bf0b066c9b4c3ec, type: 3}
 --- !u!1001 &2047789452992631743
@@ -178,13 +178,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5611936989438460777, guid: ce5e6c05cc9837b4e8e08e6507db9d07, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7269632949906858993, guid: ce5e6c05cc9837b4e8e08e6507db9d07, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7866002994442904433, guid: ce5e6c05cc9837b4e8e08e6507db9d07, type: 3}
       propertyPath: m_Name
       value: Fireball
       objectReference: {fileID: 0}
     - target: {fileID: 7866002994442904433, guid: ce5e6c05cc9837b4e8e08e6507db9d07, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7866002994442904433, guid: ce5e6c05cc9837b4e8e08e6507db9d07, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7894262575351520053, guid: ce5e6c05cc9837b4e8e08e6507db9d07, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -209,6 +225,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2911300132011670085}
     m_Modifications:
+    - target: {fileID: 1639810943392827635, guid: a1f8d8aa14428af42809cddeac1f6381, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 2650003158570179580, guid: a1f8d8aa14428af42809cddeac1f6381, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.6157198
@@ -249,9 +269,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7131054048216414988, guid: a1f8d8aa14428af42809cddeac1f6381, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8700258344733543052, guid: a1f8d8aa14428af42809cddeac1f6381, type: 3}
       propertyPath: m_Name
       value: FireballCast
+      objectReference: {fileID: 0}
+    - target: {fileID: 8700258344733543052, guid: a1f8d8aa14428af42809cddeac1f6381, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8700258344733543052, guid: a1f8d8aa14428af42809cddeac1f6381, type: 3}
       propertyPath: m_IsActive
@@ -320,13 +348,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2483452645258933042, guid: 04e8b0b6ae02ffb419cc12f41626e4e5, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 4830294202082529915, guid: 04e8b0b6ae02ffb419cc12f41626e4e5, type: 3}
       propertyPath: m_Name
       value: FireballHit
       objectReference: {fileID: 0}
     - target: {fileID: 4830294202082529915, guid: 04e8b0b6ae02ffb419cc12f41626e4e5, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4830294202082529915, guid: 04e8b0b6ae02ffb419cc12f41626e4e5, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5027596988919762063, guid: 04e8b0b6ae02ffb419cc12f41626e4e5, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7144756651780847949, guid: 04e8b0b6ae02ffb419cc12f41626e4e5, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
@@ -339,6 +379,10 @@ PrefabInstance:
     - target: {fileID: 7144756651780847949, guid: 04e8b0b6ae02ffb419cc12f41626e4e5, type: 3}
       propertyPath: InitialModule.startColor.maxColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8265284712304982075, guid: 04e8b0b6ae02ffb419cc12f41626e4e5, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
