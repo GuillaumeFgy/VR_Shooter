@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3648930786529013185}
   - component: {fileID: -6320008178018869706}
   - component: {fileID: 779438022348825944}
+  - component: {fileID: 8837749077024462283}
   m_Layer: 6
   m_Name: Fireball
   m_TagString: Enemy
@@ -27,8 +28,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1353185397172326498}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.024365561, y: -0, z: -0, w: 0.99970317}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.02397755, y: 0.1776993, z: 0.0043310304, w: 0.9837832}
+  m_LocalPosition: {x: 0.06075962, y: 0.0005352497, z: -0.010961838}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -36,7 +37,7 @@ Transform:
   - {fileID: 7065580538129485650}
   - {fileID: 569314913072851031}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 2.792, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 2.616, y: 20.5, z: 0.978}
 --- !u!114 &3648930786529013185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108,7 +109,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -127,9 +128,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
-  speed: 2
+  speed: 0.5
   lifetime: 5
   owner: {fileID: 6812314282851188598, guid: 5bc8d279dd8931045bf0b066c9b4c3ec, type: 3}
+--- !u!54 &8837749077024462283
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353185397172326498}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &2047789452992631743
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -140,15 +168,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1985429162397072360, guid: ce5e6c05cc9837b4e8e08e6507db9d07, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.15
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1985429162397072360, guid: ce5e6c05cc9837b4e8e08e6507db9d07, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.242
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1985429162397072360, guid: ce5e6c05cc9837b4e8e08e6507db9d07, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.515
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1985429162397072360, guid: ce5e6c05cc9837b4e8e08e6507db9d07, type: 3}
       propertyPath: m_LocalRotation.w

@@ -25,9 +25,8 @@ public class EnemyProjectile : MonoBehaviour
         // Ignore hitting the shooter itself
         if (owner && other.transform.IsChildOf(owner.transform)) return;
 
-        // Example player damage hook:
-        // var ph = other.GetComponentInParent<PlayerHealth>();
-        // if (ph) ph.TakeDamage(damage);
+        var ph = other.GetComponentInParent<PlayerHealth>();
+        if (ph) ph.TakeDamage(damage);
 
         Destroy(gameObject);
     }

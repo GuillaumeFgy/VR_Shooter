@@ -1,106 +1,58 @@
 ﻿using UnityEngine;
-using UnityEngine.UI; //used for the sliders and UI components
-using System.Collections;
-using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
+    [Header("Health Settings")]
+    public int maxLives = 3;
+    public GameObject[] hearts;
 
-    //this are the health parameters
-    public int startingHealth = 100;
-    public int currentHealth;
+    [Header("FX")]
+    public AudioClip hurtClip;
+    public AudioClip deathClip;
 
-    // health slider
-    public Slider healthSlider;
+    private int currentLives;
+    private AudioSource audioSrc;
+    private bool dead;
 
-    // used to simulate the hitting effect
-    public Image damageImage;
-    public float flashSpeed = 5f;
-    public Color flashColour = new Color(1f, 0f, 0f, 0.1f);
-	public bool isDead;
-   
-    // locla variables of player's movement and shooting
-    PlayerMovement playerMovement;
-    PlayerShooting playerShooting;
-
-        
-    bool damaged;
-
-
-    public void Awake ()
+    void Awake()
     {
-  
-        playerMovement = GetComponent <PlayerMovement> ();
-        playerShooting = GetComponentInChildren <PlayerShooting> ();
-		//playerRender = GetComponentInChildren <Renderer> ();
-        currentHealth = startingHealth;
-        
-        //player body can't be seen
-        isDead=false;
-		
+        currentLives = maxLives;
+        audioSrc = GetComponent<AudioSource>();
+        UpdateHearts();
     }
 
-
-    void Update ()
+    public void TakeDamage(int amount)
     {
-        //show image hit when it gets hit
-        if(damaged)
+        if (dead) return;
+
+        currentLives -= amount;
+        if (currentLives < 0) currentLives = 0;
+
+        if (hurtClip) audioSrc.PlayOneShot(hurtClip);
+        UpdateHearts();
+
+        if (currentLives <= 0)
         {
-            damageImage.color = flashColour;
+            Die();
         }
-        else
-        {
-            damageImage.color = Color.Lerp (damageImage.color, Color.clear, flashSpeed * Time.deltaTime);
-        }
-        damaged = false;
-
-        // update slider
-        healthSlider.value = (float)currentHealth / (float)startingHealth;
     }
 
-
-    public void TakeDamage (int amount)
+    void UpdateHearts()
     {
-        damaged = true;
-
-        currentHealth -= amount;
-
-        if(currentHealth <= 0 && !isDead)
+        for (int i = 0; i < hearts.Length; i++)
         {
-            Death ();
+            hearts[i].SetActive(i < currentLives);
         }
-
-       
-
     }
 
-
-    void Death ()
+    void Die()
     {
-        isDead = true;
+        if (dead) return;
+        dead = true;
 
-        //playerAudio.clip = deathClip;
-        //playerAudio.Play ();
+        if (deathClip) audioSrc.PlayOneShot(deathClip);
+        Debug.Log("PLAYER DIED");
 
-        playerMovement.enabled = false;
-        playerShooting.enabled = false;
-        
-        //fall to ground
-        GetComponent<Rigidbody>().constraints= RigidbodyConstraints.None;
-
-        transform.rotation =Quaternion.Euler(-3f,0,-3f);
-
-        Invoke("RestartLevel",6.0f);
+        // Optional: trigger Game Over screen, restart, etc.
     }
-
-
-    public void RestartLevel()
-	{
-		SceneManager.LoadScene(0);
-    }
-    
-
-    
-
-
 }

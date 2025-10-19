@@ -22,7 +22,7 @@ public class EnemySpawner : MonoBehaviour
 
     void Start()
     {
-        if (!player && Camera.main) player = Camera.main.transform;
+        if (Camera.main) player = Camera.main.transform;
         InvokeRepeating(nameof(TrySpawn), initialDelay, spawnInterval);
     }
 
@@ -35,10 +35,7 @@ public class EnemySpawner : MonoBehaviour
 
         // pick a spawn point with no nearby enemy
         Transform sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
-        // Optional: ensure it’s clear
-        // if (Physics.CheckSphere(sp.position, 0.5f)) return;
 
-        // choose prefab
         GameObject prefab;
         if (randomizePrefabPerPoint)
         {
