@@ -1540,7 +1540,7 @@ MonoBehaviour:
   damagePerShot: 20
   timeBetweenBullets: 0.15
   refNozzle: {fileID: 971704710}
-  maxDistance: 100
+  maxDistance: 200
   hitMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -1940,7 +1940,7 @@ MonoBehaviour:
   randomizePrefabPerPoint: 1
   initialDelay: 1
   spawnInterval: 5
-  maxAlive: 4
+  maxAlive: 10
   player: {fileID: 829332171}
 --- !u!4 &1010655938
 Transform:
