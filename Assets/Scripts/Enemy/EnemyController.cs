@@ -158,7 +158,7 @@ public class EnemyController : MonoBehaviour
 
         // radial push
         Vector3 radialDir = to.normalized;
-        float radialSpeed = (dist - wantRadius) * 0.9f;
+        float radialSpeed = (dist - wantRadius) * 0.4f;
 
         // tangential strafe
         Vector3 tangential = Vector3.Cross(Vector3.up, radialDir);

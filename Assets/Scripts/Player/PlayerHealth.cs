@@ -53,6 +53,6 @@ public class PlayerHealth : MonoBehaviour
         if (deathClip) audioSrc.PlayOneShot(deathClip);
         Debug.Log("PLAYER DIED");
 
-        // Optional: trigger Game Over screen, restart, etc.
+        GameManager.Instance?.OnPlayerDied();
     }
 }

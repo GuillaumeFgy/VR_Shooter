@@ -18,27 +18,26 @@ public class SoundDetector : MonoBehaviour
     public string micDevice = null;
     public int sampleRate = 44100;
 
-    [Header("Debug")]
-    public bool logClaps = false;
-
     AudioSource micSrc;
     AudioClip micClip;
     float lastClapTime = -10f;
     float[] sampleBuf;
     bool didClapThisFrame;
-
     float inhibitUntil = 0f;
 
+    // --- Public helpers -----------------------------------------------------
+
+    /// <summary>
+    /// Temporarily disables clap detection for a number of seconds.
+    /// </summary>
     public void Inhibit(float seconds)
     {
         inhibitUntil = Mathf.Max(inhibitUntil, Time.time + Mathf.Max(0f, seconds));
     }
 
-    public bool DidClapThisFrame()
-    {
-        return didClapThisFrame;
-    }
-
+    /// <summary>
+    /// Returns true once after a clap is detected, then resets the flag.
+    /// </summary>
     public bool ConsumeClap()
     {
         if (didClapThisFrame)
@@ -49,30 +48,77 @@ public class SoundDetector : MonoBehaviour
         return false;
     }
 
+    // --- Unity lifecycle ----------------------------------------------------
+
     IEnumerator Start()
     {
-        // Runtime permission (Android 6+)
-        if (!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.Microphone))
-        {
-            UnityEngine.Android.Permission.RequestUserPermission(UnityEngine.Android.Permission.Microphone);
-            // Wait a few frames for the dialog result
-            for (int i=0; i<60; i++) yield return null;
-        }
+        yield return StartCoroutine(RequestMicPermission());
         if (!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.Microphone))
         {
             Debug.LogWarning("Microphone permission denied.");
             yield break;
         }
 
+        InitializeMicrophone();
+    }
+
+    void Update()
+    {
+        didClapThisFrame = false;
+
+        // Skip if no mic or buffer
+        if (micClip == null || sampleBuf == null || sampleBuf.Length == 0) return;
+
+        if (!FetchRecentSamples()) return;
+
+        AnalyzeSamples();
+    }
+
+    void OnDisable()
+    {
+        StopMicrophone();
+    }
+
+    // --- Internal helpers ---------------------------------------------------
+
+    /// <summary>
+    /// Requests microphone permission on Android at runtime.
+    /// </summary>
+    IEnumerator RequestMicPermission()
+    {
+        if (!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.Microphone))
+        {
+            UnityEngine.Android.Permission.RequestUserPermission(UnityEngine.Android.Permission.Microphone);
+            // Wait a few frames for the dialog result
+            for (int i = 0; i < 60; i++) yield return null;
+        }
+    }
+
+    /// <summary>
+    /// Starts recording from the microphone and sets up buffers.
+    /// </summary>
+    void InitializeMicrophone()
+    {
         micSrc = gameObject.AddComponent<AudioSource>();
         micSrc.loop = true;
         micSrc.mute = true; // keep it silent
 
-        // Use output sample rate if available
         int sr = (AudioSettings.outputSampleRate > 0) ? AudioSettings.outputSampleRate : sampleRate;
+
+        // Start recording
         micClip = Microphone.Start(micDevice, true, 1, sr);
-        // Wait until the mic starts
-        while (Microphone.GetPosition(micDevice) <= 0) yield return null;
+
+        // Wait until microphone starts providing data
+        StartCoroutine(WaitForMicStart(sr));
+    }
+
+    /// <summary>
+    /// Coroutine that waits until the microphone starts and sets up the sample buffer.
+    /// </summary>
+    IEnumerator WaitForMicStart(int sr)
+    {
+        while (Microphone.GetPosition(micDevice) <= 0)
+            yield return null;
 
         micSrc.clip = micClip;
         micSrc.Play();
@@ -81,40 +127,53 @@ public class SoundDetector : MonoBehaviour
         sampleBuf = new float[windowSamples];
     }
 
-    void Update()
+    /// <summary>
+    /// Reads the most recent window of audio samples into sampleBuf.
+    /// </summary>
+    bool FetchRecentSamples()
     {
-        didClapThisFrame = false;
-        if (micClip == null || sampleBuf == null || sampleBuf.Length == 0) return;
-
         int windowSamples = sampleBuf.Length;
         int micPos = Microphone.GetPosition(micDevice);
-        if (micPos < windowSamples) return; // not enough data yet
+
+        if (micPos < windowSamples) return false; // not enough data yet
 
         int start = micPos - windowSamples;
         if (start < 0) start += micClip.samples; // wrap around ring buffer
 
         micClip.GetData(sampleBuf, start);
+        return true;
+    }
 
-        // Compute RMS and PEAK
+    /// <summary>
+    /// Processes the current sampleBuf to detect if a clap occurred.
+    /// </summary>
+    void AnalyzeSamples()
+    {
+        // Compute RMS (average power) and Peak (max amplitude)
         double sumSq = 0.0;
         float peak = 0f;
-        for (int i = 0; i < windowSamples; i++)
+
+        for (int i = 0; i < sampleBuf.Length; i++)
         {
             float s = sampleBuf[i];
             sumSq += s * s;
             float a = Mathf.Abs(s);
             if (a > peak) peak = a;
         }
-        float rms = Mathf.Sqrt((float)(sumSq / windowSamples));
-        // dBFS: 0 dB = full scale (amplitude 1.0)
+
+        float rms = Mathf.Sqrt((float)(sumSq / sampleBuf.Length));
+
+        // Convert to decibels (0 dBFS = max amplitude)
         float db = 20f * Mathf.Log10(Mathf.Max(1e-7f, rms));
 
-        // Heuristic: must be loud enough AND spiky (peak>>rms)
+        // Ratio between instantaneous peak and average level
         float peakToRms = (rms > 1e-6f) ? (peak / rms) : 999f;
+
+        // Determine if sound qualifies as a "clap"
         bool loud = db >= thresholdDb;
         bool spiky = peakToRms >= minPeakToRms;
 
-        // Debounce + external inhibit gate
+        // Check timing (debounce + inhibit)
         bool cooledDown = (Time.time - lastClapTime) >= minInterval;
         bool notInhibited = Time.time >= inhibitUntil;
 
@@ -122,12 +181,13 @@ public class SoundDetector : MonoBehaviour
         {
             lastClapTime = Time.time;
             didClapThisFrame = true;
-            if (logClaps) Debug.Log($"Clap! db={db:F1} peak/rms={peakToRms:F2}");
         }
     }
 
-
-    void OnDisable()
+    /// <summary>
+    /// Stops microphone recording and playback.
+    /// </summary>
+    void StopMicrophone()
     {
         if (micSrc != null) micSrc.Stop();
         if (Microphone.IsRecording(micDevice))
