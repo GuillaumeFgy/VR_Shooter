@@ -34,12 +34,18 @@ public class PlayerShooting : MonoBehaviour
     [Header("Input")]
     public SoundDetector clap;
 
+    [Header("Impact FX")]
+    public GameObject impactPrefab;
+    public float impactLifeTime = 2f;
+
     // --- private ---
     private int bullets;
     private bool reloading;
     private float elapsed;
     private AudioSource audioSrc;
     private Camera cam;
+    private bool bonusBurstActive = false;
+
 
     void Awake()
     {
@@ -61,6 +67,10 @@ public class PlayerShooting : MonoBehaviour
     void Update()
     {
         elapsed += Time.deltaTime;
+
+        if (bonusBurstActive)
+            return;
+
         bool triggerPressed = clap && clap.ConsumeClap();
 
         if (triggerPressed && !reloading && elapsed >= timeBetweenBullets && bullets > 0 && Time.timeScale > 0f)
@@ -68,6 +78,7 @@ public class PlayerShooting : MonoBehaviour
             Shoot();
         }
     }
+
 
     private void Shoot()
     {
@@ -114,6 +125,9 @@ public class PlayerShooting : MonoBehaviour
     {
         DrawTracer(origin, hit.point);
 
+        // Spawn explosion at the hit point
+        SpawnImpact(hit.point, hit.normal);
+
         // 1) Pop enemy projectiles with one shot
         var incoming = hit.collider ? hit.collider.GetComponentInParent<EnemyProjectile>() : null;
         if (incoming)
@@ -122,7 +136,15 @@ public class PlayerShooting : MonoBehaviour
             return; // done for this shot
         }
 
-        // 2) Damage enemies
+        // 2) Difficulty cubes
+        var difficultyTarget = hit.collider ? hit.collider.GetComponentInParent<DifficultyTarget>() : null;
+        if (difficultyTarget != null)
+        {
+            difficultyTarget.OnHit();
+            return; // we changed scene, no more work for this shot
+        }
+
+        // 3) Damage enemies
         if (hit.collider && hit.collider.CompareTag("Enemy"))
         {
             var eh = hit.collider.GetComponentInParent<EnemyHealth>();
@@ -131,11 +153,20 @@ public class PlayerShooting : MonoBehaviour
         }
     }
 
+
+
     private void HandleMiss(Vector3 origin, Vector3 direction)
     {
         Debug.LogError("NO HIT");
-        DrawTracer(origin, origin + direction * maxDistance);
+
+        Vector3 endPoint = origin + direction * maxDistance;
+
+        DrawTracer(origin, endPoint);
+
+        // Spawn impact at the end of the tracer ray
+        SpawnImpact(endPoint, -direction);
     }
+
 
     private void DrawTracer(Vector3 from, Vector3 to)
     {
@@ -176,5 +207,58 @@ public class PlayerShooting : MonoBehaviour
         bullets = initialBullets;
         reloading = false;
     }
+
+    private void SpawnImpact(Vector3 position, Vector3 normal)
+    {
+        if (!impactPrefab) return;
+
+        // Orient the effect so its "forward" points along the surface normal
+        Quaternion rot = Quaternion.LookRotation(normal);
+        GameObject fx = Instantiate(impactPrefab, position, rot);
+
+        // If your prefab doesn’t auto-destroy (via ParticleSystem), clean it up:
+        Destroy(fx, impactLifeTime);
+    }
+
+    public void TriggerBulletBonus(int bonusMaxBullets, int shots, float fireInterval)
+    {
+        if (!gameObject.activeInHierarchy) return;
+
+        StartCoroutine(BulletBonusRoutine(bonusMaxBullets, shots, fireInterval));
+    }
+
+    private IEnumerator BulletBonusRoutine(int bonusMaxBullets, int shots, float fireInterval)
+    {
+        if (bonusBurstActive) yield break;
+        bonusBurstActive = true;
+
+        // Save old settings
+        int oldInitialBullets = initialBullets;
+        float oldTimeBetweenBullets = timeBetweenBullets;
+
+        // Set temporary burst values
+        initialBullets = bonusMaxBullets;
+        bullets = bonusMaxBullets;
+        timeBetweenBullets = fireInterval;
+        reloading = false;            // make sure we can fire now
+
+        // Fire shots quickly
+        for (int i = 0; i < shots; i++)
+        {
+            Shoot();
+            yield return new WaitForSeconds(fireInterval);
+        }
+
+        // Restore normal settings
+        initialBullets = oldInitialBullets;
+        timeBetweenBullets = oldTimeBetweenBullets;
+
+        // After the last shot, normal reload logic will kick in.
+        // Because initialBullets is now back to 3, the next reload
+        // will restore 3 bullets.
+        bonusBurstActive = false;
+    }
+
+
 
 }

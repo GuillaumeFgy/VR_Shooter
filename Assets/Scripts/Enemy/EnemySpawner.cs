@@ -4,10 +4,10 @@ using System.Collections.Generic;
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Spawn Points")]
-    public Transform[] spawnPoints;               // fixed positions in your scene
+    public Transform[] spawnPoints;
 
     [Header("Prefabs")]
-    public GameObject[] enemyPrefabs;            // your 5 prefabs
+    public GameObject[] enemyPrefabs;           
     public bool randomizePrefabPerPoint = true;  // off = use index mapping
 
     [Header("Timing")]
@@ -16,15 +16,18 @@ public class EnemySpawner : MonoBehaviour
     public int maxAlive = 8;
 
     [Header("Target")]
-    public Transform player; // set to VR camera
+    public Transform player;
 
     readonly List<GameObject> alive = new();
 
     void Start()
     {
-        if (Camera.main) player = Camera.main.transform;
+        spawnInterval = GameDifficulty.spawnInterval;
+        maxAlive = GameDifficulty.maxAlive;
+
         InvokeRepeating(nameof(TrySpawn), initialDelay, spawnInterval);
     }
+
 
     void TrySpawn()
     {
@@ -52,7 +55,6 @@ public class EnemySpawner : MonoBehaviour
         var go = Instantiate(prefab, sp.position, sp.rotation);
         alive.Add(go);
 
-        // optional: wire the target at runtime
         var ctrl = go.GetComponent<EnemyController>();
         if (ctrl && player) ctrl.target = player;
     }

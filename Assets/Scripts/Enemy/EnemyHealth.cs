@@ -1,6 +1,5 @@
 using UnityEngine;
 
-
 public class EnemyHealth : MonoBehaviour
 {
     [Header("Stats")]
@@ -44,14 +43,11 @@ public class EnemyHealth : MonoBehaviour
         {
             Die();
         }
-        else 
+        else
         {
             anim.SetTrigger("Hit");
         }
-            
-
     }
-
 
     void Die()
     {
@@ -67,9 +63,15 @@ public class EnemyHealth : MonoBehaviour
         var ctrl = GetComponent<EnemyController>();
         if (ctrl) ctrl.enabled = false;
 
+        // --- ADD THIS: award score ---
+        if (config != null && ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.AddScore(config.scoreValue);
+        }
+        // ------------------------------
+
         // Schedule destroy after delay (let animation play)
         if (destroyOnDeath)
             Destroy(gameObject, destroyDelay);
     }
-
 }

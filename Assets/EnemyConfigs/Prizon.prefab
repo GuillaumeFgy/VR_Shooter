@@ -701,7 +701,7 @@ MonoBehaviour:
   projectileSpawn: {fileID: 0}
   projectilePrefab: {fileID: 0}
   target: {fileID: 0}
-  anim: {fileID: 0}
+  anim: {fileID: 6376058272461032068}
   pSpeed: Speed
   pInMelee: InMelee
   tAttack: Attack

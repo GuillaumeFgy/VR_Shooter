@@ -21,4 +21,7 @@ public class EnemyConfig : ScriptableObject
     public float zigZagAmplitude = 1.2f;
     public float zigZagFrequency = 2.2f;
     public float pushBackForce = 4f;
+
+    [Header("Score")]
+    public int scoreValue = 10;   // how many points this enemy gives when killed
 }

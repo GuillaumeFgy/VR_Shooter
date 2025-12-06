@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Lusif
   m_EditorClassIdentifier: 
   maxHP: 1
-  moveSpeed: 1
+  moveSpeed: 0.8
   turnSpeed: 360
   contactDamage: 1
   projectileDamage: 1
@@ -25,3 +25,4 @@ MonoBehaviour:
   zigZagAmplitude: 1.2
   zigZagFrequency: 2.2
   pushBackForce: 4
+  scoreValue: 75

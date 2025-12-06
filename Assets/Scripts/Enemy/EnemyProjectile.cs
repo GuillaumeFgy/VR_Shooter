@@ -30,4 +30,12 @@ public class EnemyProjectile : MonoBehaviour
 
         Destroy(gameObject);
     }
+    void OnDestroy()
+    {
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.AddScore(5);
+        }
+    }
+
 }

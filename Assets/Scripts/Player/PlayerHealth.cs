@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -28,6 +30,8 @@ public class PlayerHealth : MonoBehaviour
         currentLives -= amount;
         if (currentLives < 0) currentLives = 0;
 
+        Handheld.Vibrate();
+
         if (hurtClip) audioSrc.PlayOneShot(hurtClip);
         UpdateHearts();
 
@@ -36,6 +40,7 @@ public class PlayerHealth : MonoBehaviour
             Die();
         }
     }
+
 
     void UpdateHearts()
     {
@@ -53,6 +58,32 @@ public class PlayerHealth : MonoBehaviour
         if (deathClip) audioSrc.PlayOneShot(deathClip);
         Debug.Log("PLAYER DIED");
 
-        GameManager.Instance?.OnPlayerDied();
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.SaveBestScoreForCurrentDifficulty();
+        }
+
+        StartCoroutine(ReturnToMenu());
     }
+
+
+    private IEnumerator ReturnToMenu()
+    {
+        yield return new WaitForSeconds(1.0f);
+
+        SceneManager.LoadScene("Menu");
+    }
+    public bool AddLife(int amount)
+    {
+        if (dead) return false;
+
+        int newLives = Mathf.Clamp(currentLives + amount, 0, maxLives);
+        bool increased = newLives > currentLives;
+
+        currentLives = newLives;
+        UpdateHearts();
+
+        return increased;
+    }
+
 }

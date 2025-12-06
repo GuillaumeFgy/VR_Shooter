@@ -17,11 +17,12 @@ MonoBehaviour:
   turnSpeed: 360
   contactDamage: 1
   projectileDamage: 0
-  attackRate: 1
+  attackRate: 0.5
   attackRangeDistance: 1
-  attackRangeMelee: 2
+  attackRangeMelee: 5
   projectileSpeed: 0
   strafeRadius: 0
   zigZagAmplitude: 1.2
   zigZagFrequency: 2.2
   pushBackForce: 4
+  scoreValue: 45

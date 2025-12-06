@@ -33,17 +33,26 @@ public class EnemyController : MonoBehaviour
 
     EnemyHealth health;
     float attackTimer;
-    Vector3 zigZagPhase;  // for ZigZag
+    Vector3 zigZagPhase;
     float strafeAngle;
 
     void Awake()
     {
         health = GetComponent<EnemyHealth>();
-        if (!config) config = health.config; // auto-pull from health if not set
-        if (!target && Camera.main) target = Camera.main.transform;
+        if (!config) config = health.config;
+        if (!target)
+        {
+            GameObject playerGO = GameObject.Find("Player");
+            if (playerGO != null)
+                target = playerGO.transform;
+            else if (Camera.main)
+                target = Camera.main.transform;
+        }
+
         zigZagPhase = new Vector3(Random.value * 10f, 0, 0);
         strafeAngle = Random.Range(0f, 360f);
     }
+
 
     void Update()
     {
@@ -158,7 +167,7 @@ public class EnemyController : MonoBehaviour
 
         // radial push
         Vector3 radialDir = to.normalized;
-        float radialSpeed = (dist - wantRadius) * 0.4f;
+        float radialSpeed = (dist - wantRadius) * 0.9f;
 
         // tangential strafe
         Vector3 tangential = Vector3.Cross(Vector3.up, radialDir);
